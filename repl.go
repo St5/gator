@@ -71,5 +71,30 @@ func getCommands() map[string]cliCommands {
 			description: "Return list of users",
 			callback:    commands.CallbackUsers,
 		},
+		"agg": {
+			name:        "agg",
+			description: "Aggregate RSS",
+			callback:    commands.CallbackAgg,
+		},
+		"addfeed": {
+			name:        "addfeed <name> <url>",
+			description: "Add feed to DB",
+			callback:    commands.CallbackAddFeed,
+		},
+		"feeds": {
+			name:        "feeds",
+			description: "List Feeds",
+			callback:    commands.CallbackListFeeds,
+		},
+		"follow": {
+			name:        "follow <url>",
+			description: "Assign a user to a feed",
+			callback:    commands.CallbackFollow,
+		},
+		"following": {
+			name:        "following",
+			description: "Print all the names of the feeds the current user is following.",
+			callback:    commands.CallbackFollowing,
+		},
 	}
 }
