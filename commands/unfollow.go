@@ -4,13 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/st5/gator/internal/database"
 )
 
-func CallbackFollow(state State, user database.User, params ...string) error{
+func CallbackUnfollow(state State, user database.User, params ...string) error {
 
 	if len(params) < 1 {
 		return errors.New("url is required param")
@@ -24,22 +22,18 @@ func CallbackFollow(state State, user database.User, params ...string) error{
 		return err
 	}
 
-	ffParams := database.CreateFeedFollowParams{
-		ID: uuid.New(),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+	paramsWhere := database.UnfollowParams {
 		UserID: userId,
 		FeedID: feed.ID,
 	}
 
-	_, err = state.Db.CreateFeedFollow(context.Background(), ffParams)
-	
+	err = state.Db.Unfollow(context.Background(), paramsWhere)
+
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("The feed was following")
+	fmt.Println("The feed was unfollowing")
 
 	return nil
-
 }

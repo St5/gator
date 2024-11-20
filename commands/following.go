@@ -3,9 +3,11 @@ package commands
 import (
 	"context"
 	"fmt"
+
+	"github.com/st5/gator/internal/database"
 )
 
-func CallbackFollowing(state State, params ...string) error{
+func CallbackFollowing(state State, user database.User, params ...string) error{
 
 	userName := state.Config.CurrentUserName
 

@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
+
 	"github.com/st5/gator/commands"
+	"github.com/st5/gator/internal/database"
 )
 
 type cliCommands struct {
@@ -49,7 +52,7 @@ func getCommands() map[string]cliCommands {
 		"help": {
 			name: "help",
 			description: "Help commands",
-			callback: commands.CallbackHelp,
+			callback: CallbackHelp,
 		},
 		"login": {
 			name:        "login",
@@ -72,14 +75,14 @@ func getCommands() map[string]cliCommands {
 			callback:    commands.CallbackUsers,
 		},
 		"agg": {
-			name:        "agg",
+			name:        "agg <duration>",
 			description: "Aggregate RSS",
 			callback:    commands.CallbackAgg,
 		},
 		"addfeed": {
 			name:        "addfeed <name> <url>",
 			description: "Add feed to DB",
-			callback:    commands.CallbackAddFeed,
+			callback:    middlewareLoggedIn(commands.CallbackAddFeed),
 		},
 		"feeds": {
 			name:        "feeds",
@@ -89,12 +92,33 @@ func getCommands() map[string]cliCommands {
 		"follow": {
 			name:        "follow <url>",
 			description: "Assign a user to a feed",
-			callback:    commands.CallbackFollow,
+			callback:    middlewareLoggedIn(commands.CallbackFollow),
 		},
 		"following": {
 			name:        "following",
 			description: "Print all the names of the feeds the current user is following.",
-			callback:    commands.CallbackFollowing,
+			callback:    middlewareLoggedIn(commands.CallbackFollowing),
 		},
+		"unfollow": {
+			name:        "unfollow <url>",
+			description: "Print all the names of the feeds the current user is following.",
+			callback:    middlewareLoggedIn(commands.CallbackUnfollow),
+		},
+		"browse": {
+			name:        "browse <limit>",
+			description: "Print all post of the feeds the current user is following.",
+			callback:    middlewareLoggedIn(commands.CallbackBrowse),
+		},
+	}
+}
+
+func middlewareLoggedIn(handler func(state commands.State, user database.User, params ...string) error) func(state commands.State, params ...string) error {
+	return func(state commands.State, params ...string) error {
+		user, err := state.Db.GetUser(context.Background(), state.Config.CurrentUserName)
+		if err != nil {
+			return err
+		}
+
+		return handler(state, user, params...)
 	}
 }

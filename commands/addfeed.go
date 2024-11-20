@@ -10,18 +10,10 @@ import (
 	"github.com/st5/gator/internal/database"
 )
 
-func CallbackAddFeed(state State, params ...string) error{
+func CallbackAddFeed(state State, user database.User, params ...string) error{
 
 	if len(params) < 2 {
 		return errors.New("feed name and url is required param")
-	}
-
-	userName := state.Config.CurrentUserName
-
-	user, err := state.Db.GetUser(context.Background(), userName)
-
-	if err != nil {
-		return err
 	}
 
 	userId := user.ID
@@ -38,7 +30,7 @@ func CallbackAddFeed(state State, params ...string) error{
 		UserID: userId,
 	}
 
-	_ , err = state.Db.CreateFeed(context.Background(), feedParam)
+	_ , err := state.Db.CreateFeed(context.Background(), feedParam)
 
 	if err != nil {
 		return err
@@ -46,7 +38,7 @@ func CallbackAddFeed(state State, params ...string) error{
 
 	fmt.Println("Feed was saved")
 
-	err = CallbackFollow(state, url)
+	err = CallbackFollow(state, user, url)
 
 	if err != nil {
 		return err
